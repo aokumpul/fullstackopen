@@ -25,17 +25,23 @@ const PersonForm = ({onSubmit, newName, nameOnChange, newNumber, numberOnChange}
   )
 }
 
-const Persons = ({filteredPersons}) => {
+const Persons = ({filteredPersons, onDelete}) => {
   return (
     filteredPersons.map(person =>
-      <Person key={person.name} person={person}/>
+      <Person key={person.id} person={person} onDelete={onDelete} />
     )
   )
 }
 
-const Person = ({person}) => {
+const Person = ({person, onDelete}) => {
+  const handleRemoveClick = () => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      onDelete(person.id) 
+    }
+  }
+
   return (
-    <p>{person.name} {person.number}</p>
+    <p>{person.name} {person.number} <button onClick={handleRemoveClick}>delete</button></p>
   )
 }
 
@@ -87,6 +93,14 @@ const App = () => {
     setFilter(event.target.value)
   }
 
+  const handleDeletePerson = (id) => {
+    personService
+      .remove(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+  }
+
   const filteredPersons = persons.filter(
     person => person.name.toLowerCase().includes(filter.toLowerCase())
   )
@@ -99,7 +113,7 @@ const App = () => {
       <PersonForm onSubmit={addPerson} newName={newName} nameOnChange={handlePersonChange}
       newNumber={newNumber} numberOnChange={handleNumberChange} />
       <h3>Numbers</h3>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} onDelete={handleDeletePerson} />
     </div>
   )
 }
