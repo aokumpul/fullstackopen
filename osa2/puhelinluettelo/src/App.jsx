@@ -136,11 +136,6 @@ const App = () => {
       }, 3000)
   }
 
-
-const person = persons.find(p => p.name.toLowerCase() === newName.toLowerCase())
-
-
-
   const filteredPersons = persons.filter(
     person => person.name.toLowerCase().includes(filter.toLowerCase())
   )
