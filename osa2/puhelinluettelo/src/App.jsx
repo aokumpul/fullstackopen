@@ -79,12 +79,19 @@ const App = () => {
             setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson ))
             setNewName('')
             setNewNumber('')
-          })
 
-        setSuccessMessage(`Updated ${person.name}`)
-        setTimeout(() => {
-        setSuccessMessage(null)
-        }, 3000)
+            setSuccessMessage(`Updated ${person.name}`)
+            setTimeout(() => {
+            setSuccessMessage(null)
+            }, 3000)
+          })
+          .catch(error => {
+            setErrorMessage(`Information of ${person.name} has already been removed from server`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 3000)
+            setPersons(persons.filter(p => p.id !== person.id))
+          })
       }
       return
     }
@@ -100,12 +107,12 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+
+        setSuccessMessage(`Added ${newName}`)
+        setTimeout(() => {
+        setSuccessMessage(null)
+        }, 3000)
       })
-    
-    setSuccessMessage(`Added ${newName}`)
-    setTimeout(() => {
-      setSuccessMessage(null)
-    }, 3000)
   }
 
   const handlePersonChange = (event) => {
@@ -128,12 +135,19 @@ const App = () => {
       .remove(id)
       .then(() => {
         setPersons(persons.filter(person => person.id !== id))
-      })
 
-      setSuccessMessage(`Deleted ${name}`)
-      setTimeout(() => {
-      setSuccessMessage(null)
-      }, 3000)
+        setSuccessMessage(`Deleted ${name}`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 3000)
+      })
+      .catch(error => {
+        setErrorMessage(`Information of ${name} has already been removed from server`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 3000)
+        setPersons(persons.filter(person => person.id !== id))
+      })
   }
 
   const filteredPersons = persons.filter(
