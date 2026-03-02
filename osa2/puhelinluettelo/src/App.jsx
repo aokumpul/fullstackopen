@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const Filter = ({filter, onChange}) => {
   return (
@@ -36,7 +37,7 @@ const Persons = ({filteredPersons, onDelete}) => {
 const Person = ({person, onDelete}) => {
   const handleRemoveClick = () => {
     if (window.confirm(`Delete ${person.name} ?`)) {
-      onDelete(person.id) 
+      onDelete(person.id)
     }
   }
 
@@ -50,6 +51,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -77,6 +80,11 @@ const App = () => {
             setNewName('')
             setNewNumber('')
           })
+
+        setSuccessMessage(`Updated ${person.name}`)
+        setTimeout(() => {
+        setSuccessMessage(null)
+        }, 3000)
       }
       return
     }
@@ -93,6 +101,11 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
+    
+    setSuccessMessage(`Added ${newName}`)
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 3000)
   }
 
   const handlePersonChange = (event) => {
@@ -108,12 +121,25 @@ const App = () => {
   }
 
   const handleDeletePerson = (id) => {
+    const personToBeDeleted = persons.find(p => p.id === id)
+    const name = personToBeDeleted.name
+
     personService
       .remove(id)
       .then(() => {
         setPersons(persons.filter(person => person.id !== id))
       })
+
+      setSuccessMessage(`Deleted ${name}`)
+      setTimeout(() => {
+      setSuccessMessage(null)
+      }, 3000)
   }
+
+
+const person = persons.find(p => p.name.toLowerCase() === newName.toLowerCase())
+
+
 
   const filteredPersons = persons.filter(
     person => person.name.toLowerCase().includes(filter.toLowerCase())
@@ -122,6 +148,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} type='success' />
+      <Notification message={errorMessage} type='error' />
       <Filter filter={filter} onChange={handleFilterChange} />
       <h3>add a new</h3>
       <PersonForm onSubmit={addPerson} newName={newName} nameOnChange={handlePersonChange}
