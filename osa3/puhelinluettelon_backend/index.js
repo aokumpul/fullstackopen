@@ -20,7 +20,7 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    Person.find({}).then(persons => {
+    return Person.find({}).then(persons => {
         response.json(persons)
     })
 })
@@ -30,9 +30,9 @@ app.get('/api/persons/:id', (request, response) => {
     const person = persons.find(person => person.id === id)
 
     if (person) {
-        response.json(person)
+        return response.json(person)
     } else {
-        response.status(404).end()
+        return response.status(404).end()
     }
 })
 
@@ -67,7 +67,7 @@ app.post('/api/persons', (request, response) => {
     })
 
     person.save().then(savedPerson => {
-        response.json(savedPerson)
+        return response.json(savedPerson)
     })
 })
 
@@ -75,7 +75,7 @@ app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
     persons = persons.filter(person => person.id !== id)
 
-    response.status(204).end()
+    return response.status(204).end()
 })
 
 const PORT = process.env.PORT || 3001
