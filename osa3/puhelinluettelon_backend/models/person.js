@@ -28,7 +28,7 @@ const personSchema = new mongoose.Schema({
             },
             message: props => `${props.value} is not a valid phone number!`
         },
-        required: [true, 'Phone number required']
+        required: [true, 'Phone number required!']
     }
 })
 
