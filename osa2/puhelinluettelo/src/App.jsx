@@ -113,6 +113,13 @@ const App = () => {
         setSuccessMessage(null)
         }, 3000)
       })
+      .catch(error => {
+        console.log(error.response.data)
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 3000)
+      })
   }
 
   const handlePersonChange = (event) => {
