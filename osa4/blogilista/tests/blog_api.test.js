@@ -9,16 +9,16 @@ const api = supertest(app)
 
 const initialBlogs = [
   {
-    "title": "My Frog Blog",
-    "author": "Dr. Froggy",
-    "url": "www.myfrogblog.com",
-    "likes": 64
+    title: "My Frog Blog",
+    author: "Dr. Froggy",
+    url: "www.myfrogblog.com",
+    likes: 64
   },
   {
-    "title": "My Dog Blog",
-    "author": "Mr. Puppy",
-    "url": "www.mydogblog.com",
-    "likes": 666
+    title: "My Dog Blog",
+    author: "Mr. Puppy",
+    url: "www.mydogblog.com",
+    likes: 666
   }
 ]
 
@@ -52,10 +52,10 @@ describe('HTTP GET to /api/blogs', () => {
 describe('HTTP POST to /api/blogs', () => {
   test('adds a valid blog and increases the number of blogs by one', async () => {
     const newBlog = {
-      "title": "My Cat Blog",
-      "author": "Ms. Kitten",
-      "url": "www.mycatblog.com",
-      "likes": 69
+      title: "My Cat Blog",
+      author: "Ms. Kitten",
+      url: "www.mycatblog.com",
+      likes: 69
     }
 
     await api
@@ -75,6 +75,22 @@ describe('HTTP POST to /api/blogs', () => {
     assert(authors.includes(newBlog.author))
     assert(urls.includes(newBlog.url))
     assert(likes.includes(newBlog.likes))
+  })
+
+  test('missing a value on likes defaults it to zero', async () => {
+    const newBlog = {
+      title: "My Nonfamous Blog",
+      author: "Mr. Nobody",
+      url: "www.myblog.com",
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, 0)
   })
 })
 
