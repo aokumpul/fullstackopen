@@ -58,23 +58,19 @@ describe('HTTP POST to /api/blogs', () => {
       likes: 69
     }
 
-    await api
+    const response = await api
       .post('/api/blogs')
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
-    const titles = response.body.map(b => b.title)
-    const authors = response.body.map(b => b.author)
-    const urls = response.body.map(b => b.url)
-    const likes = response.body.map(b => b.likes)
+    const updatedBlogs = await api.get('/api/blogs')
 
-    assert.strictEqual(response.body.length, initialBlogs.length + 1)
-    assert(titles.includes(newBlog.title))
-    assert(authors.includes(newBlog.author))
-    assert(urls.includes(newBlog.url))
-    assert(likes.includes(newBlog.likes))
+    assert.strictEqual(updatedBlogs.body.length, initialBlogs.length + 1)
+    assert.strictEqual(response.body.title, newBlog.title)
+    assert.strictEqual(response.body.author, newBlog.author)
+    assert.strictEqual(response.body.url, newBlog.url)
+    assert.strictEqual(response.body.likes, newBlog.likes)
   })
 
   test('missing a value on likes defaults it to zero', async () => {
