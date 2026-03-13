@@ -31,17 +31,13 @@ beforeEach(async () => {
 })
 
 describe('HTTP GET to /api/blogs', () => {
-  test('returns a correct count of blogs', async () => {
-    const response = await api.get('/api/blogs')
-    
-    assert.strictEqual(response.body.length, initialBlogs.length)
-  })
-
-  test('returns all the blogs as a JSON', async () => {
-    await api
+  test('returns a correct number of blogs as a JSON', async () => {
+    const response = await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.length, initialBlogs.length)
   })
 
   test('returns blogs which have an unique identifier field named as "id"', async () => {
