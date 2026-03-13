@@ -49,6 +49,35 @@ describe('HTTP GET to /api/blogs', () => {
   })
 })
 
+describe('HTTP POST to /api/blogs', () => {
+  test('adds a valid blog and increases the number of blogs by one', async () => {
+    const newBlog = {
+      "title": "My Cat Blog",
+      "author": "Ms. Kitten",
+      "url": "www.mycatblog.com",
+      "likes": 69
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map(b => b.title)
+    const authors = response.body.map(b => b.author)
+    const urls = response.body.map(b => b.url)
+    const likes = response.body.map(b => b.likes)
+
+    assert.strictEqual(response.body.length, initialBlogs.length + 1)
+    assert(titles.includes(newBlog.title))
+    assert(authors.includes(newBlog.author))
+    assert(urls.includes(newBlog.url))
+    assert(likes.includes(newBlog.likes))
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
