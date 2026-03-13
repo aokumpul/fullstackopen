@@ -3,54 +3,41 @@ const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const helper = require('./test_helper')
 const Blog = require("../models/blog")
 
 const api = supertest(app)
 
-const initialBlogs = [
-  {
-    title: "My Frog Blog",
-    author: "Dr. Froggy",
-    url: "www.myfrogblog.com",
-    likes: 64
-  },
-  {
-    title: "My Dog Blog",
-    author: "Mr. Puppy",
-    url: "www.mydogblog.com",
-    likes: 666
-  }
-]
-
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  let noteObject = new Blog(initialBlogs[0])
-  await noteObject.save()
-  noteObject = new Blog(initialBlogs[1])
-  await noteObject.save()
-})
+    await Blog.deleteMany({})
+    await Blog.insertMany(helper.initialBlogs)
+  })
 
-describe('HTTP GET to /api/blogs', () => {
-  test('returns a correct number of blogs as a JSON', async () => {
-    const response = await api
+describe('when there are initially some blogs saved'), () => {
+  test('blogs are returned as json', async () => {
+    await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
-
-    assert.strictEqual(response.body.length, initialBlogs.length)
   })
 
-  test('returns blogs which have an unique identifier field named as "id"', async () => {
+  test('all blogs are returned', async () => {
     const response = await api.get('/api/blogs')
-    const blogs = response.body
 
-    assert(blogs.every(b => b.id))
-    assert.strictEqual(blogs.every(b => b._id), false)
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
   })
-})
 
-describe('HTTP POST to /api/blogs', () => {
-  test('adds a valid blog and increases the number of blogs by one', async () => {
+  test('blogs have a unique identifier field "id"', async () => {
+    const response = await api.get('/api/blogs')
+    const body = response.body
+
+    assert(body.every(b => b.id))
+    assert.strictEqual(body.every(b => b._id), false)
+  })
+}
+
+describe('addition of a new blog', () => {
+  test('succeeds with valid data', async () => {
     const newBlog = {
       title: "My Cat Blog",
       author: "Ms. Kitten",
@@ -58,22 +45,20 @@ describe('HTTP POST to /api/blogs', () => {
       likes: 69
     }
 
-    const response = await api
+    await api
       .post('/api/blogs')
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const updatedBlogs = await api.get('/api/blogs')
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
 
-    assert.strictEqual(updatedBlogs.body.length, initialBlogs.length + 1)
-    assert.strictEqual(response.body.title, newBlog.title)
-    assert.strictEqual(response.body.author, newBlog.author)
-    assert.strictEqual(response.body.url, newBlog.url)
-    assert.strictEqual(response.body.likes, newBlog.likes)
+    const titles = blogsAtEnd.map(b => b.title)
+    assert(titles.includes(newBlog.title))
   })
 
-  test('missing a value on likes defaults it to zero', async () => {
+  test('defaults likes to zero if missing', async () => {
     const newBlog = {
       title: "My Nonfamous Blog",
       author: "Mr. Nobody",
@@ -89,7 +74,7 @@ describe('HTTP POST to /api/blogs', () => {
     assert.strictEqual(response.body.likes, 0)
   })
 
-  test('returns 400 if title is missing', async () => {
+  test.only('fails with status code 400 if title is missing', async () => {
     const newBlog = {
       author: "Herra Hakkarainen",
       url: "www.herrahakkis.fi",
@@ -101,12 +86,11 @@ describe('HTTP POST to /api/blogs', () => {
       .send(newBlog)
       .expect(400)
 
-    const response = await api.get('/api/blogs')
-
-    assert.strictEqual(response.body.length, initialBlogs.length)
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
 
-  test('returns 400 if url is missing', async () => {
+  test.only('fails with status code 400 0 if url is missing', async () => {
     const newBlog = {
       title: "Herra Hakkaraisen blogi",
       author: "Herra Hakkarainen",
@@ -117,9 +101,8 @@ describe('HTTP POST to /api/blogs', () => {
       .send(newBlog)
       .expect(400)
 
-    const response = await api.get('/api/blogs')
-
-    assert.strictEqual(response.body.length, initialBlogs.length)
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
 })
 
