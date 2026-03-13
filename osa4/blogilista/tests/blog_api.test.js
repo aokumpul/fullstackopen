@@ -33,6 +33,7 @@ beforeEach(async () => {
 describe('HTTP GET to /api/blogs', () => {
   test('returns a correct count of blogs', async () => {
     const response = await api.get('/api/blogs')
+    
     assert.strictEqual(response.body.length, initialBlogs.length)
   })
 
@@ -43,7 +44,15 @@ describe('HTTP GET to /api/blogs', () => {
       .expect('Content-Type', /application\/json/)
   })
 
-  after(async () => {
-    await mongoose.connection.close()
+  test('returns blogs which have an unique identifier field named as "id"', async () => {
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+
+    assert(blogs.every(b => b.id))
+    assert.strictEqual(blogs.every(b => b._id), false)
   })
+})
+
+after(async () => {
+  await mongoose.connection.close()
 })
