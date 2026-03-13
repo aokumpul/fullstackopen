@@ -74,7 +74,7 @@ describe('addition of a new blog', () => {
     assert.strictEqual(response.body.likes, 0)
   })
 
-  test.only('fails with status code 400 if title is missing', async () => {
+  test('fails with status code 400 if title is missing', async () => {
     const newBlog = {
       author: "Herra Hakkarainen",
       url: "www.herrahakkis.fi",
@@ -90,7 +90,7 @@ describe('addition of a new blog', () => {
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
 
-  test.only('fails with status code 400 0 if url is missing', async () => {
+  test('fails with status code 400 0 if url is missing', async () => {
     const newBlog = {
       title: "Herra Hakkaraisen blogi",
       author: "Herra Hakkarainen",
@@ -103,6 +103,22 @@ describe('addition of a new blog', () => {
 
     const blogsAtEnd = await helper.blogsInDb()
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
+})
+
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+
+      const ids = blogsAtEnd.map(b => b.id)
+      assert(!ids.includes(blogToDelete.id))
+
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
   })
 })
 
