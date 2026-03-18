@@ -13,14 +13,14 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const blogFormRef = useRef()
 
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -36,10 +36,10 @@ const App = () => {
     event.preventDefault()
     try {
       const user = await loginService.login({ username, password })
-      
+
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -59,21 +59,21 @@ const App = () => {
   }
 
   const handleLogout = () => {
-      window.localStorage.removeItem('loggedBlogappUser') 
-    
-      setSuccessMessage('you have been logged out, please refresh the page')
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
+    window.localStorage.removeItem('loggedBlogappUser')
+
+    setSuccessMessage('you have been logged out, please refresh the page')
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
   }
 
   const addBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject)
-      
+
       setBlogs(blogs.concat(newBlog))
       blogFormRef.current.toggleVisibility()
-      
+
       setSuccessMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -99,7 +99,7 @@ const App = () => {
 
       const modifiedBlogs = blogs.map(b => (b.id === updatedBlog.id ? updatedBlog : b))
       setBlogs(modifiedBlogs)
-      
+
       setSuccessMessage(`a like added on ${likedBlog.title}`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -178,23 +178,23 @@ const App = () => {
       <Notification message={successMessage} type='success' />
       <Notification message={errorMessage} type='error' />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-      
+
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog}/>
       </Togglable>
-      
+
       {blogs
         .slice()
         .sort((a, b) => b.likes - a.likes)
         .map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          user={user}
-          handleLike={likeBlog}
-          handleDelete={deleteBlog}
-        />
-      )}
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            handleLike={likeBlog}
+            handleDelete={deleteBlog}
+          />
+        )}
     </div>
   )
 }

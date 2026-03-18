@@ -24,7 +24,7 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
         <div>
           {blog.title} {blog.author} <button onClick={toggleVisibility}>view</button>
         </div>
-      </div>      
+      </div>
       <div style={showWhenVisible}>
         <div>
           {blog.title} {blog.author} <button onClick={toggleVisibility}>hide</button>
@@ -43,8 +43,8 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
             <button onClick={() => handleDelete(blog)}>remove</button>
           </div>
         )}
-      </div>      
+      </div>
     </div>
-)}
+  )}
 
 export default Blog
