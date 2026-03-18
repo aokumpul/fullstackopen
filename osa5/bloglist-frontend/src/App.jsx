@@ -79,7 +79,33 @@ const App = () => {
         setSuccessMessage(null)
       }, 5000)
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'an error occurred'
+      const errorMessage = error.response?.data?.error || 'an error occurred when trying to create a new blog'
+      setErrorMessage(errorMessage)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const likeBlog = async (blog) => {
+    try {
+      const likedBlog = {
+        ...blog,
+        likes: blog.likes + 1
+      }
+
+      const updatedBlog = await blogService.update(blog.id, likedBlog)
+      updatedBlog.user = blog.user
+
+      const modifiedBlogs = blogs.map(b => (b.id === updatedBlog.id ? updatedBlog : b))
+      setBlogs(modifiedBlogs)
+      
+      setSuccessMessage(`a like added on ${likedBlog.title}`)
+      setTimeout(() => {
+        setSuccessMessage(null)
+      }, 5000)
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'an error occurred when trying to like a blog'
       setErrorMessage(errorMessage)
       setTimeout(() => {
         setErrorMessage(null)
@@ -136,7 +162,11 @@ const App = () => {
       </Togglable>
       
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleLike={likeBlog}
+        />
       )}
     </div>
   )
