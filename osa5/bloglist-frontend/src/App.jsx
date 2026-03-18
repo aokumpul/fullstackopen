@@ -113,6 +113,28 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.remove(blog.id)
+
+        const modifiedBlogs = blogs.filter(b => (b.id !== blog.id))
+        setBlogs(modifiedBlogs)
+
+        setSuccessMessage(`successfully removed ${blog.title}`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      } catch (error) {
+        const errorMessage = error.response?.data?.error || 'an error occurred when trying to remove a blog'
+        setErrorMessage(errorMessage)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={handleLogin}>
       <div>
@@ -168,7 +190,9 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
+          user={user}
           handleLike={likeBlog}
+          handleDelete={deleteBlog}
         />
       )}
     </div>
