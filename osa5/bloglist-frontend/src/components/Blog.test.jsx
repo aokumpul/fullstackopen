@@ -20,9 +20,10 @@ describe('<Blog />', () => {
       username: 'suppo'
     }
 
-    render(<Blog blog={blog} user={user} />)
+    const { container } = render(<Blog blog={blog} user={user} />)
 
-    expect(screen.getAllByText('Testiblogi Ismo Laitela')).toBeDefined()
+    const collapsedDiv = container.querySelector('.blogCollapsed')
+    expect(collapsedDiv).toHaveTextContent('Testiblogi Ismo Laitela')
 
     expect(screen.queryByText('www.blog.stellans.fi')).not.toBeVisible()
     expect(screen.queryByText('likes 666')).not.toBeVisible()
@@ -46,14 +47,15 @@ describe('<Blog />', () => {
       username: 'suppo'
     }
 
-    render(<Blog blog={blog} user={blogUser} />)
+    const { container } = render(<Blog blog={blog} user={blogUser} />)
 
     const user = userEvent.setup()
     const viewButton = screen.getByText('view')
 
     await user.click(viewButton)
 
-    expect(screen.getAllByText('Testiblogi Ismo Laitela')).toBeDefined()
+    const expandedDiv = container.querySelector('.blogExpanded')
+    expect(expandedDiv).toHaveTextContent('Testiblogi Ismo Laitela')
 
     expect(screen.getByText('www.blog.stellans.fi')).toBeVisible()
     expect(screen.getByText('likes 666')).toBeVisible()
